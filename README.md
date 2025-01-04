@@ -1,7 +1,7 @@
 # FlappyBird_AI
 
 ## Live site
-__https://flappy-bird-ai-git-main-amrabdelwaheds-projects.vercel.app/__
+__https://flappy-bird-ai-amr-abdelwahed.vercel.app/__
 
 ## Screenshot
 ![Screenshot](images/website_screenshot.png)
