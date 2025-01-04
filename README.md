@@ -1,7 +1,7 @@
 # FlappyBird_AI
 
 ## Live site
-__https://flappybird-ai.netlify.app__
+__https://flappy-bird-ai-git-main-amrabdelwaheds-projects.vercel.app/__
 
 ## Screenshot
 ![Screenshot](images/website_screenshot.png)
@@ -14,7 +14,7 @@ This project was made using __P5js__ to render the game and __TensorFlow__ js to
 ## Run Local
 Download the code and navigate to this directory.
 ```
-git clone https://github.com/SeanFitz1997/FlappyBird_AI.git
+git clone https://github.com/AmrAbdelwahed/FlappyBird-AI.git
 cd FlappyBird_AI
 ```
 Run a __python server__ and open the __index.html__ file.
