@@ -1,264 +1,308 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-		<!-- P5js library-->
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.9.0/p5.min.js"></script>
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.9.0/addons/p5.dom.min.js"></script>
+    <!-- Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.9.0/p5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.9.0/addons/p5.dom.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.0.4/dist/tf.min.js"></script>
+    
+    <!-- Project Files -->
+    <script src="src/Environment.js"></script>
+    <script src="src/Pipe.js"></script>
+    <script src="src/Ground.js"></script>
+    <script src="src/Population.js"></script>
+    <script src="src/Bird.js"></script>
+    <script src="src/Brain.js"></script>
+    <script src="src/Neuroevolution.js"></script>
+    <script src="src/main.js"></script>
 
-		<!-- Tensorflow JS -->
-		<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.0.4/dist/tf.min.js"></script>
+    <title>Flappy Bird AI</title>
 
-		<!-- Bootstrap -->
-		<link
-			rel="stylesheet"
-			href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
-			integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
-			crossorigin="anonymous"
-		/>
-		<script
-			src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
-			integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
-			crossorigin="anonymous"
-		></script>
-		<script
-			src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
-			integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
-			crossorigin="anonymous"
-		></script>
-		<script
-			src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
-			integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
-			crossorigin="anonymous"
-		></script>
+    <style>
+        :root {
+            --primary-color: #2a2d3e;
+            --secondary-color: #3f51b5;
+            --accent-color: #7986cb;
+            --text-color: #e0e0e0;
+            --card-bg: #1a1c2a;
+        }
 
-		<!-- Font Awesome -->
-		<link
-			rel="stylesheet"
-			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
-		/>
+        body {
+            background: linear-gradient(135deg, var(--primary-color), #1a1c2a);
+            color: var(--text-color);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            margin: 0;
+            min-height: 100vh;
+        }
 
-		<!-- Imports -->
-		<script src="src/Environment.js"></script>
-		<script src="src/Pipe.js"></script>
-		<script src="src/Ground.js"></script>
-		<script src="src/Population.js"></script>
-		<script src="src/Bird.js"></script>
-		<script src="src/Brain.js"></script>
-		<script src="src/Neuroevolution.js"></script>
-		<script src="src/main.js"></script>
+        .navbar {
+            background: var(--card-bg);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 1rem 0;
+        }
 
-		<!-- Custom CSS -->
-		<style>
-			#canvas_card {
-				margin: 50px auto;
-				width: 704px;
-			}
+        .nav-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+        }
 
-			#about_card {
-				width: 80%;
-				min-width: 704px;
-				margin: auto;
-				margin-bottom: 50px;
-			}
-		</style>
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            text-decoration: none;
+            color: var(--text-color);
+        }
 
-		<title>Flappy Bird AI</title>
-	</head>
+        .brand img {
+            width: 40px;
+            height: 40px;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+        }
 
-	<body>
-		<div class="container-fullwidth">
-			<!-- Header -->
-			<header>
-				<div class="navbar navbar-dark bg-dark box-shadow">
-					<div class="container d-flex justify-content-around">
-						<!-- Title -->
-						<p class="navbar-brand d-flex align-items-center">
-							<img
-								src="images/bird.png"
-								alt="Flappy Bird"
-								width="30px"
-								height="30px"
-							/>
-							<strong>Flappy Bird AI</strong>
-						</p>
+        .brand-text {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
 
-						<!-- State Buttons -->
-						<div>
-							<button
-								id="trained_bird_button"
-								class="btn btn-primary btn-lg"
-							>
-								Trained Bird
-							</button>
-							<button
-								id="view_training_button"
-								class="btn btn-secondary btn-lg"
-							>
-								View Training
-							</button>
-						</div>
-					</div>
-				</div>
-			</header>
+        .control-buttons {
+            display: flex;
+            gap: 1rem;
+        }
 
-			<!-- Game Card -->
-			<div id="canvas_card" class="card">
-				<!-- Game -->
-				<div
-					id="canvas_container"
-					class="d-flex justify-content-center"
-				>
-					<!-- P5 canvas injected here -->
-				</div>
-				<div class="d-flex justify-content-end">
-					<div class="mt-3 mr-3">
-						<h6>Game Speed</h6>
-						<div id="speed_slider_container">
-							<!-- P5 game speed slider injected here -->
-						</div>
-					</div>
-				</div>
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
 
-				<!-- Description -->
-				<div class="card-body">
-					<h5 id="game_title" class="card-title">
-						<!-- Game title injected here -->
-					</h5>
-					<p id="game_description" class="card-text">
-						<!-- Game description injected here -->
-					</p>
-					<p>
-						See the <b><a href="#about_card">about</a></b> section
-						for more details.
-					</p>
-					<hr />
-					<!-- Game interactions -->
-					<p>
-						Press <kbd>S</kbd> to download the AI's Tensorflow model
-					</p>
-					<p>Move the slider to adjust the game speed</p>
-				</div>
-			</div>
+        .btn-primary {
+            background: var(--secondary-color);
+            color: white;
+        }
 
-			<!-- About Card -->
-			<div id="about_card" class="card">
-				<div class="card-header">
-					<h5>About</h5>
-				</div>
-				<div class="card-body">
-					<p class="card-text">
-						This AI was trained using
-						<b>N.E.A.T</b>. This is a genetic algorithm that trains
-						the AI by creating generations of agents and simulating
-						them in a environment. Each bird has a Neural Network
-						that will decide to make the bird flap based on its
-						inputs. The birds with the best Neural Networks are
-						selected for the next generation and slightly mutated to
-						create new behavior.
-					</p>
-					<p class="card-text">
-						This project was made using
-						<a href="https://p5js.org/"><b>P5js</b></a> to render
-						the game and
-						<a href="https://www.tensorflow.org/js"
-							><b>TensorFlow js</b></a
-						>
-						to create the Neural Networks.
-					</p>
-					<div>
-						<img
-							src="images/p5js_logo.png"
-							alt="p5js logo"
-							width="100px"
-						/>
-						<img
-							src="images/tensorflow_logo.png"
-							alt="tensorflow logo"
-							width="100px"
-						/>
-					</div>
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-color);
+        }
 
-					<div class="mt-4 mb-4">
-						<p class="card-text">
-							The code for this project can be found
-							<a
-								href="https://github.com/AmrAbdelwahed/FlappyBird-AI"
-								><b>Here</b>.
-								<i
-									class="fa fa-github"
-									style="font-size:48px;"
-								></i
-							></a>
-						</p>
-					</div>
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
 
-					<h6 class="card-title">Neural Network</h6>
-					<p class="card-text">
-						Each bird has a Neural network that determines whether
-						to flap or not. This network is a sequential model made
-						up of three <b>dense layers</b>. An input layer with 5
-						neurons, a hidden layer with 8 neurons and a output
-						layer with 2 neurons.
-					</p>
-					<p class="card-text">
-						The five inputs the bird receives are:
-					</p>
-					<ol>
-						<li>The Birds Y position</li>
-						<li>The Birds velocity</li>
-						<li>The Birds distance from the pipe</li>
-						<li>The Y position of the top pipe</li>
-						<li>The Y position of the bottom pipe</li>
-					</ol>
-					<p class="card-text">
-						The output layer has a <b>softmax activation</b> and
-						will return two values that will add up to one. The bird
-						will flap if the first value is greater than the second
-						and will not if the opposite is true.
-					</p>
-					<div class="d-flex justify-content-around mt-4 mb-4">
-						<img src="images/inputs_diagram.png" width="45%" />
-						<img
-							src="images/neural_network_diagram.png"
-							width="45%"
-						/>
-					</div>
+        .game-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            background: var(--card-bg);
+            border-radius: 16px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
 
-					<h6 class="card-title">Training Process</h6>
-					<p class="card-text">
-						The training process for this AI involves:
-					</p>
-					<ol>
-						<li>
-							Create an initial population of <b>N</b> Birds with
-							neural networks containing random weights
-						</li>
-						<li>
-							Simulate the population in the environment until all
-							birds have died.
-						</li>
-						<li>
-							Create the next generation with the best preforming
-							bird's Neural networks.
-						</li>
-						<li>
-							Mutate a small portion of weights in each birds
-							Neural network <small>(E.g. 10%)</small>with random
-							values to create new behaviors.
-						</li>
-						<li>
-							Repeat steps 2 - 4 until birds can successfully
-							navigate the environment.
-						</li>
-					</ol>
-				</div>
-			</div>
-		</div>
-	</body>
+        .canvas-wrapper {
+            padding: 1rem;
+            background: rgba(0, 0, 0, 0.2);
+        }
 
-	<!-- Page Interaction -->
-	<script src="index.js"></script>
+        .controls {
+            padding: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .speed-control {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .info-section {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: var(--card-bg);
+            border-radius: 16px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--accent-color);
+        }
+
+        .tech-stack {
+            display: flex;
+            gap: 2rem;
+            margin: 2rem 0;
+            align-items: center;
+        }
+
+        .tech-stack img {
+            height: 40px;
+            filter: grayscale(1) brightness(1.5);
+            transition: all 0.3s ease;
+        }
+
+        .tech-stack img:hover {
+            filter: none;
+            transform: scale(1.1);
+        }
+
+        kbd {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+
+        .neural-network-visuals {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3rem;
+            margin: 3rem 0;
+        }
+
+        .neural-network-visuals img {
+            width: 80%;
+            max-width: 800px;
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease;
+        }
+
+        .neural-network-visuals img:hover {
+            transform: scale(1.02);
+        }
+
+        @media (max-width: 768px) {
+            .nav-content {
+                flex-direction: column;
+                gap: 1rem;
+                padding: 1rem;
+            }
+
+            .neural-network-visuals {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="nav-content">
+            <a href="#" class="brand">
+                <img src="images/bird.png" alt="Neural Flapper Logo" />
+                <span class="brand-text">Flappy Bird AI</span>
+            </a>
+            <div class="control-buttons">
+                <button id="trained_bird_button" class="btn btn-primary">Expert Bird</button>
+                <button id="view_training_button" class="btn btn-secondary">Watch Training</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="game-container">
+        <div class="canvas-wrapper">
+            <div id="canvas_container"></div>
+        </div>
+        <div class="controls">
+            <div class="speed-control">
+                <h4>Simulation Speed</h4>
+                <div id="speed_slider_container"></div>
+            </div>
+            <p id="game_title" class="section-title"></p>
+            <p id="game_description"></p>
+        </div>
+    </div>
+
+    <div class="info-section">
+        <h2 class="section-title">How It Works</h2>
+        <p>
+            This AI uses the NEAT (NeuroEvolution of Augmenting Topologies) algorithm to master Flappy Bird. 
+            Each bird's brain is a neural network that evolves over generations, learning to navigate through pipes 
+            with increasing precision.
+        </p>
+
+        <div class="tech-stack">
+            <img src="images/p5js_logo.png" alt="P5.js" title="P5.js for game rendering" />
+            <img src="images/tensorflow_logo.png" alt="TensorFlow.js" title="TensorFlow.js for neural networks" />
+        </div>
+
+        <h3 class="section-title">Neural Network Architecture</h3>
+        <p>
+            Each bird's brain processes 5 key inputs through a dense neural network:
+            - Bird's vertical position
+            - Current velocity
+            - Distance to next pipe
+            - Top pipe position
+            - Bottom pipe position
+        </p>
+
+        <div class="neural-network-visuals">
+            <img src="images/inputs_diagram.png" alt="Neural network inputs" />
+            <img src="images/neural_network_diagram.png" alt="Neural network architecture" />
+        </div>
+    </div>
+
+    <script>
+        // Game state management
+        const gameStates = {
+            expert: {
+                title: "Expert Neural Flapper",
+                description: "Watch our best-performing AI navigate the course with precision. This neural network was trained over 15 generations to achieve perfect pipe navigation."
+            },
+            training: {
+                title: "Evolution in Action",
+                description: "Witness neural evolution as each generation of birds learns and adapts. The most successful neural networks are selected and mutated to create increasingly skilled flyers."
+            }
+        };
+
+        // UI state management
+        let currentState = 'expert';
+
+        function updateInterface(state) {
+            const info = gameStates[state];
+            document.getElementById('game_title').textContent = info.title;
+            document.getElementById('game_description').textContent = info.description;
+        }
+
+        function switchMode(mode, activeBtn, inactiveBtn) {
+            activeBtn.className = 'btn btn-primary';
+            inactiveBtn.className = 'btn btn-secondary';
+            currentState = mode;
+            updateInterface(mode);
+            document.getElementById('speed_slider_container').innerHTML = '';
+            setup(mode === 'expert');
+        }
+
+        // Event listeners
+        document.getElementById('trained_bird_button').addEventListener('click', function() {
+            if (currentState !== 'expert') {
+                switchMode('expert', this, document.getElementById('view_training_button'));
+            }
+        });
+
+        document.getElementById('view_training_button').addEventListener('click', function() {
+            if (currentState !== 'training') {
+                switchMode('training', this, document.getElementById('trained_bird_button'));
+            }
+        });
+
+        // Initial setup
+        updateInterface(currentState);
+    </script>
+</body>
 </html>
